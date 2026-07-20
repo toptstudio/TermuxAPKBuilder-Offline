@@ -3,7 +3,6 @@ set -e
 
 PROJECT_DIR=$(pwd)
 ANDROID_JAR="$PROJECT_DIR/android.jar"
-DOCUMENTFILE_JAR="$PROJECT_DIR/documentfile/classes.jar"
 R8_JAR="$PROJECT_DIR/r8.jar"
 RES_DIR="$PROJECT_DIR/res"
 MANIFEST="$PROJECT_DIR/AndroidManifest.xml"
@@ -18,9 +17,10 @@ if [ ! -f "$ANDROID_JAR" ]; then
 fi
 echo "✅ android.jar ready"
 
-for jar in "$DOCUMENTFILE_JAR" "$R8_JAR"; do
-    [ -f "$jar" ] || { echo "❌ Missing $jar"; exit 1; }
-done
+if [ ! -f "$R8_JAR" ]; then
+    echo "❌ Missing $R8_JAR"
+    exit 1
+fi
 echo "✅ All tools ready"
 
 rm -rf "$GEN_DIR" "$OBJ_DIR" "$BIN_DIR"
@@ -36,7 +36,7 @@ OLD_R=$(find "$SRC_DIR" -name "R.java" 2>/dev/null | head -1)
 
 echo "☕ Compiling Java sources..."
 javac -d "$OBJ_DIR" \
-    -classpath "$ANDROID_JAR:$DOCUMENTFILE_JAR" \
+    -classpath "$ANDROID_JAR" \
     -source 1.8 -target 1.8 -Xlint:-options \
     $(find "$SRC_DIR" -name "*.java") \
     $(find "$GEN_DIR" -name "*.java" 2>/dev/null || true)
@@ -47,10 +47,8 @@ java -Xmx1024m -cp "$R8_JAR" com.android.tools.r8.D8 \
     --lib "$ANDROID_JAR" \
     --min-api 21 \
     --classpath "$ANDROID_JAR" \
-    --classpath "$DOCUMENTFILE_JAR" \
     --output "$DEX_JAR" \
-    $(find "$OBJ_DIR" -name "*.class") \
-    "$DOCUMENTFILE_JAR"
+    $(find "$OBJ_DIR" -name "*.class")
 
 echo "📦 Packaging APK..."
 cp "$BIN_DIR/resources.apk" "$BIN_DIR/app-unsigned.apk"
