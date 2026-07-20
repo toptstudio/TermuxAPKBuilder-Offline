@@ -88,8 +88,8 @@ TermuxAPKBuilder-Offline/
 │   ├── menu.sh
 │   ├── build.sh
 │   ├── android.jar
-│   └── r8.jar
-├── your-keystore-name.keystore
+│   ├── r8.jar
+│   └── your-keystore-name.keystore
 ├── LICENSE.md
 └── README.md
 ```
