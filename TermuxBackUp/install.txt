@@ -1,0 +1,1 @@
+termux-setup-storage && sleep 4 && bash /sdcard/Download/TermuxBackUp/menu.sh
